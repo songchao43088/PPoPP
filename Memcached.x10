@@ -14,7 +14,7 @@ public class Memcached {
 		
 		
 		abstract def description():String;
-		abstract def coreFunc();
+		abstract def coreFunc():void;
 		
 		def run(){
 			Console.OUT.println("============== " + description() + " ==============");
