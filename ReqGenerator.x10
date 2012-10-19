@@ -4,14 +4,14 @@ import x10.io.File;
 
 public class ReqGenerator {
 	val rand:Random;
-	val mu:Double;
-	val sigma:Double;
-	def this(mu:Double, sigma:Double){
+	val exp:Double;
+	val standardDev:Double;
+	def this(exp:Double, standardDev:Double){
 		rand = new Random(System.nanoTime());
-		this.mu = mu;
-		this.sigma = sigma;
+		this.exp = exp;
+		this.standardDev = standardDev;
 	}
 	def generate(){
-		return Math.sqrt(-2*(Math.log(rand.nextDouble())))*Math.cos(2*Math.PI*rand.nextDouble());
+		return exp+Math.floor(standardDev * Math.sqrt(-2*(Math.log(rand.nextDouble())))*Math.cos(2*Math.PI*rand.nextDouble()));
 	}
 }
