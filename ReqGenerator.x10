@@ -11,7 +11,7 @@ public class ReqGenerator {
 		this.exp = exp;
 		this.standardDev = standardDev;
 	}
-	def generate(){
-		return exp+Math.floor(standardDev * Math.sqrt(-2*(Math.log(rand.nextDouble())))*Math.cos(2*Math.PI*rand.nextDouble()));
+	def generate():Int{
+		return Math.floor(exp+Math.floor(standardDev * Math.sqrt(-2*(Math.log(rand.nextDouble())))*Math.cos(2*Math.PI*rand.nextDouble()))) as Int;
 	}
 }
