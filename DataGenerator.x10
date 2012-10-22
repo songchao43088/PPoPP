@@ -5,6 +5,7 @@ import x10.io.File;
 public class DataGenerator {
 	val rand:Random;
 	val file:File;
+	val MAX_INT:Int = 1000000;
 	def this(){
 		rand = new Random(System.nanoTime());
 		file  = new File("~DB");
@@ -18,7 +19,7 @@ public class DataGenerator {
 	  	val streamRead  = file.openRead();
 	  	streamRead.readByte();
 	  	streamRead.close();
-		return rand.nextInt();
+		return rand.nextInt(MAX_INT);
 	}
 }
 
