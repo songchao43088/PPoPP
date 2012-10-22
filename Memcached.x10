@@ -21,34 +21,35 @@ public class Memcached {
 			val end = Timer.milliTime();
 			val time = end - start;
 			
-			Console.OUT.println("Time: "+ time );
-			
-			
+			Console.OUT.println("Time: "+ time );			
 		}	
 	}
 	
 	private static class SerialVer extends Version {
+		
+		val cache:Cache;
+		
+		def this(cacheSize:Int){		
+			cache = new Cache(cacheSize);
+		}
+		
 		def description():String {
 			return "Serial Implementation";
 			}
 		
 		def coreFunc() {
 			
-			var req:Int;		
+			var req:Int, resp:Int;		
 			for(var i:Int = 0; i < NUM_REQS; i++){
 				req = reqGen.generate();
 			
-				if(cache.search(req)){ // Cache hit 
-					heap.update();
+				if(cache.search(req) == -1){
+		
+					resp = dataGen.generate(req);
+					cache.insert(req, resp);	
 					
-				}else{ // FIXME Cachea miss, but what if the cache run out of space?
-					resp = dataGen.generate();
-					
-					heap.insert(req);
-					cache.insert(req, resp);						
 				}		
-			}
-						
+			}						
 			
 		}
 	}
@@ -65,15 +66,21 @@ public class Memcached {
 		
 	}
 	
-	public static def main(Array[String]) {
+	public static def main(argv:Array[String]{self.rank==1}) {
+		
+		if (argv.size != 1) {
+			Console.ERR.println("USAGE: Memcached <cacheSize>");
+			return;
+		}
+		val cacheSize:Int = Int.parseInt(argv(0));
 		
 		var v:Version;
 		
-		v = new Memcached.SerialVer();
+		v = new Memcached.SerialVer(cacheSize);
 		v.run();
 		
-		v = new Memcached.ParallelVer();
-		v.run();
+		//v = new Memcached.ParallelVer(cacheSize);
+		//v.run();
 		
 	}
 }
