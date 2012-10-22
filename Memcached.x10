@@ -3,32 +3,32 @@ import x10.util.Timer;
 public class Memcached {
 	
 	private static abstract class Version {
-		
-		static val NUM_REQS = 100000d;
-		val reqGen:ReqGenerator = new ReqGenerator(3000.00, 1000.00);
-		val dataGen:DataGenerator = new DataGenerator();
-
-		
 		abstract def description():String;
 		abstract def coreFunc():void;
 		
 		def run(){
-			Console.OUT.println("============== " + description() + " ==============");
+			Console.OUT.println("\t============== " + description() + " ==============");
 			val start = Timer.milliTime();
 			coreFunc();
 			val end = Timer.milliTime();
 			val time = end - start;
 			
-			Console.OUT.println("Time: "+ time );			
+			Console.OUT.println("\tTime: "+ time );			
 		}	
 	}
 	
 	private static class SerialVer extends Version {
 		
 		val cache:Cache;
-		
-		def this(cacheSize:Int){		
+		val NUM_REQS:Int;
+		val reqGen:ReqGenerator;
+		val dataGen:DataGenerator;
+		def this(numOfReqs:Int, cacheSize:Int, reqExp:Double, reqStddev: Double){
+			NUM_REQS = numOfReqs;	
 			cache = new Cache(cacheSize);
+			reqGen= new ReqGenerator(reqExp, reqStddev);
+			dataGen = new DataGenerator(8*(Math.floor(reqStddev) as Int));
+			
 		}
 		
 		def description():String {
@@ -65,18 +65,27 @@ public class Memcached {
 	}
 	
 	public static def main(argv:Array[String]{self.rank==1}) {
-		
-		if (argv.size != 1) {
-			Console.ERR.println("USAGE: Memcached <cacheSize>");
+		/*
+			numOfReqs is the number of requests to be tested.
+			cacheSize is the size of cache in terms of key-value pairs.
+			reqExp is the expectation of the requests generated.
+			reqStddev is the standard deviation of the request generated.
+			The request keys generated are integers following normal distribution. 
+		*/
+		if (argv.size != 4) {
+			Console.ERR.println("USAGE: Memcached <numOfReqs> <cacheSize> <reqExp> <reqStddev>");
 			return;
 		}
-		val cacheSize:Int = Int.parseInt(argv(0));
+		val numOfReqs:Int = Int.parseInt(argv(0));
+		val cacheSize:Int = Int.parseInt(argv(1));
+		val reqExp:Int = Int.parseInt(argv(2));
+		val reqStddev:Int = Int.parseInt(argv(3));
 		
 		var v:Version;
-		
-		v = new Memcached.SerialVer(cacheSize);
+		Console.OUT.println("======numOfReqs:"+numOfReqs+" cacheSize:"+cacheSize+" reqExp:"+reqExp+" reqStddev:"+reqStddev+" ======");
+		v = new Memcached.SerialVer(numOfReqs,cacheSize,reqExp,reqStddev);
 		v.run();
-		
+		Console.OUT.println("======End======");
 		//v = new Memcached.ParallelVer(cacheSize);
 		//v.run();
 		
