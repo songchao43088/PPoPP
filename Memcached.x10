@@ -7,11 +7,9 @@ public class Memcached {
 		static val NUM_REQS = 10000;
 		val reqGen = new ReqGenerator();
 		val dataGen = new DataGenerator();
+		//FIXME need to specify the maximum number of the pairs of (key, val) the cache could have, Heap(Int)
 		val heap = new Heap();
 		val cache = new Cache();
-		
-		
-		
 		
 		abstract def description():String;
 		abstract def coreFunc():void;
@@ -40,10 +38,10 @@ public class Memcached {
 			for(var i:Int = 0; i < NUM_REQS; i++){
 				req = reqGen.generate();
 			
-				if(cache.search(req)){
+				if(cache.search(req)){ // Cache hit 
 					heap.update();
 					
-				}else{
+				}else{ // FIXME Cachea miss, but what if the cache run out of space?
 					resp = dataGen.generate();
 					
 					heap.insert(req);
