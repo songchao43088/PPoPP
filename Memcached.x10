@@ -2,13 +2,15 @@ import x10.util.Timer;
 
 public class Memcached {
 	
-	private static abstract class Version {	
+	private static abstract class Version {
 		
-		static val NUM_REQS = 100000d;
-		val reqGen:ReqGenerator = new ReqGenerator(3000.00, 1000.00);
-		val dataGen:DataGenerator = new DataGenerator();
+		static val NUM_REQS = 10000;
+		val reqGen = new ReqGenerator();
+		val dataGen = new DataGenerator();
+		//FIXME need to specify the maximum number of the pairs of (key, val) the cache could have, Heap(Int)
+		val heap = new Heap();
+		val cache = new Cache();
 		
-					
 		abstract def description():String;
 		abstract def coreFunc():void;
 		
