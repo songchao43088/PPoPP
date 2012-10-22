@@ -6,7 +6,7 @@ public class Memcached {
 		
 		static val NUM_REQS = 100000d;
 		val reqGen:ReqGenerator = new ReqGenerator(3000.00, 1000.00);
-		val dataGen:DataGenerator = new DataGenerator();
+		val dataGen:DataGenerator = new DataGenerator(6*1000);
 
 		
 		abstract def description():String;

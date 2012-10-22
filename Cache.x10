@@ -1,4 +1,5 @@
 import x10.util.HashMap;
+import x10.io.File;
 
 public class Cache {
 	
@@ -6,12 +7,14 @@ public class Cache {
 	var freeSize:Int;
 	val heap:Heap;
 	val map:HashMap[Int, Int];
-	
+	val log:x10.io.FileWriter;
+
 	def this(size:Int){
 		this.size = size;
 		this.freeSize = size;
 		this.heap = new Heap(size);
 		this.map = new HashMap[Int, Int](size);
+		this.log  = (new File("log")).openWrite();
 	}
 	
 	def search(key:Int):Int{
@@ -21,6 +24,8 @@ public class Cache {
 		try{
 			value = map.getOrThrow(key);
 			heap.update(key);
+			log.write(("Key:"+key+" Value:"+value+" H/M:H\n").bytes());
+			log.flush();
 		}
 		catch(e:Exception){	
 			
@@ -29,7 +34,7 @@ public class Cache {
 		finally{
 			
 			return value;		
-		}	
+		}
 	}
 	
 	def insert(key:Int, value:Int){
@@ -48,6 +53,8 @@ public class Cache {
 			heap.insert(key);
 			
 		}
+		log.write(("Key:"+key+" Value:"+value+" H/M:M\n").bytes());
+			log.flush();
 	}
 		
 	
