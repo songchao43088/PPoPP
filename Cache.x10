@@ -17,8 +17,18 @@ public class Cache {
 		this.log  = (new File("log")).openWrite();
 	}
 	
+	def display() {
+		Console.OUT.print("Cache: \n [ \n");
+		var print_helper : Long = 0;
+		for (i in map.keySet()) {
+			if ((print_helper % 6) as Int == 0) Console.OUT.println();
+			print_helper += 1;
+			Console.OUT.print( "\t("+ i + ",\t"+ map.get(i)+")" );
+		}
+		Console.OUT.println("\n ]");
+	}
+	
 	def search(key:Int):Int{
-		
 		var value:Int = 0;
 		
 		try{
@@ -27,12 +37,10 @@ public class Cache {
 			log.write(("Key:"+key+" Value:"+value+" H/M:H\n").bytes());
 			log.flush();
 		}
-		catch(e:Exception){	
-			
+		catch(e:Exception){
 			value = -1;
 		}
 		finally{
-			
 			return value;		
 		}
 	}
@@ -56,6 +64,4 @@ public class Cache {
 		log.write(("Key:"+key+" Value:"+value+" H/M:M\n").bytes());
 			log.flush();
 	}
-		
-	
 }
