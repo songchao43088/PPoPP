@@ -6,7 +6,7 @@ public class Functests {
 		
 		static val NUM_REQS = 10000;
 		val reqGen:ReqGenerator = new ReqGenerator(3000.00, 50.00);
-		val dataGen:DataGenerator = new DataGenerator();
+		val dataGen:DataGenerator = new DataGenerator(10000);
 
 		
 		abstract def description():String;
