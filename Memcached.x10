@@ -39,26 +39,64 @@ public class Memcached {
 			
 			var req:Int, resp:Int;		
 			for(var i:Int = 0; i < NUM_REQS; i++){
+				
 				req = reqGen.generate();
 			
 				if(cache.search(req) == -1){
 		
 					resp = dataGen.generate(req);
-					cache.insert(req, resp);	
-					
-				}		
+					cache.insert(req,resp);	
+				}
 			}						
 			
 		}
 	}
 	
 	private static class ParallelVer extends Version {
+		val cache:CacheParallel;
+		val NUM_REQS:Int;
+		val reqGen:ReqGeneratorParallel;
+		val dataGen:DataGeneratorParallel;
+		def this(numOfReqs:Int, cacheSize:Int, reqExp:Double, reqStddev: Double){
+			NUM_REQS = numOfReqs;	
+			cache = new CacheParallel(cacheSize);
+			reqGen= new ReqGeneratorParallel(reqExp, reqStddev);
+			dataGen = new DataGeneratorParallel(8*(Math.floor(reqStddev) as Int));
+			
+		}
+		
 		def description():String {
 			return "Parallel Implementation";
 			}
 		
 		def coreFunc() {
-						
+			
+			finish for(var i:Int = 0; i < NUM_REQS; i++){
+				async{
+					val req = reqGen.generate();
+					val check = cache.search(req);
+					if( check == -1){
+						val resp = dataGen.generate(req);
+						cache.insert(req, resp);					
+					if (resp != req){
+						throw new Exception ("wrong");
+					}
+					} else {
+						if (req != check){
+							throw new Exception ("wrong");
+						}
+					}
+				}	
+/*
+				async{
+					val req = reqGen.generate();
+					if(cache.search(req) == -1){
+						val resp = dataGen.generate(req);
+						cache.insert(req, resp);					
+					}
+				}	
+*/
+			}						
 			
 		}
 		
@@ -86,8 +124,8 @@ public class Memcached {
 		v = new Memcached.SerialVer(numOfReqs,cacheSize,reqExp,reqStddev);
 		v.run();
 		Console.OUT.println("======End======");
-		//v = new Memcached.ParallelVer(cacheSize);
-		//v.run();
+		v = new Memcached.ParallelVer(numOfReqs,cacheSize,reqExp,reqStddev);
+		v.run();
 		
 	}
 }

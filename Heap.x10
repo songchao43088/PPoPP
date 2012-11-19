@@ -123,7 +123,7 @@ public class Heap {
 			}
 		}
 		if (cur == -1) {
-			Console.OUT.println("The record you are trying to update is not exist.\n");
+			//Console.OUT.println("The record you are trying to update is not exist.\n");
 			return;
 		}
 		ts++;
