@@ -15,10 +15,10 @@ public class ReqGeneratorParallel {
 	}
 	def generate():Int{
 		//Console.OUT.println("req:17");
-		reqlock.lock();
+		//reqlock.lock();
 		val retval:Int = Math.floor(exp+Math.floor(standardDev * Math.sqrt(-2*(Math.log(rand.nextDouble())))*Math.cos(2*Math.PI*rand.nextDouble()))) as Int;
 		//Console.OUT.println("req:20");
-		reqlock.unlock();
+		//reqlock.unlock();
 		return retval;
 	}
 }
