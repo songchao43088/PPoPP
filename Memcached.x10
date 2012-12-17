@@ -55,7 +55,6 @@ public class Memcached {
 	
 	private static class ParallelVer extends Version {
 		val cache:Array[CacheParallel];
-		//val cache:CacheParallel;
 		val NUM_REQS:Int;
 		val reqGen:Array[ReqGeneratorParallel];
 		val dataGen:DataGeneratorParallel;
@@ -64,7 +63,6 @@ public class Memcached {
 		def this(numOfReqs:Int, cacheSize:Int, reqExp:Double, reqStddev: Double, nworkers:Int){
 			NUM_REQS = numOfReqs;	
 			cache = new Array[CacheParallel](nworkers,(p:Int) => new CacheParallel(cacheSize/nworkers));
-			//cache = new CacheParallel(cacheSize);
 			reqGen= new Array[ReqGeneratorParallel](nworkers, (p:Int) => new ReqGeneratorParallel(reqExp, reqStddev));
 			dataGen = new DataGeneratorParallel(8*(Math.floor(reqStddev) as Int));
 			this.nworkers = nworkers;
@@ -77,6 +75,7 @@ public class Memcached {
 		
 		def coreFunc() {
 
+			// for every worker, generate pre-stored requests and store them all in the queue
 			finish for(var j:Int = 0; j < nworkers; j++){
 				val index = j;
 				async {
@@ -91,22 +90,32 @@ public class Memcached {
 					}
 				}
 			}
+
+			// main functionality part of cache
 			finish for(var i:Int = 0; i < nworkers; i++){
 				val index = i;
 				async{
 					for(var k:Int = 0; k < queue(index).size();k++){
 						val req = queue(index).get(k);
 						val check = cache(index).search(req);
+						
 						if( check == -1){
 							val resp = dataGen.generate(req);				
 							cache(index).insert(req, resp);				
-						}
-					}		
+						} /*else {
+							if (check!=req){
+								throw new Exception("Incorrect!!!!!!!");
+							}
+						}*/
+						
+					}
 				}	
 			}
-			for (var i:Int=0;i<nworkers;i++){
+			
+			/*for (var i:Int=0;i<nworkers;i++){
 				Console.OUT.println(cache(i).freeSize+",");
-			}								
+			}*/								
+			
 		}
 	}
 	
@@ -119,9 +128,11 @@ public class Memcached {
 			The request keys generated are integers following normal distribution. 
 		*/
 		if (argv.size != 5) {
-			Console.ERR.println("USAGE: Memcached <numOfReqs> <cacheSize> <reqExp> <reqStddev>");
+			Console.ERR.println("USAGE: Memcached <numOfReqs> <cacheSize> <reqExp> <reqStddev> <numOfWorkers>");
 			return;
 		}
+		
+		
 		val numOfReqs:Int = Int.parseInt(argv(0));
 		val cacheSize:Int = Int.parseInt(argv(1));
 		val reqExp:Int = Int.parseInt(argv(2));
